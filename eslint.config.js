@@ -18,11 +18,11 @@ export default [
     languageOptions: { ecmaVersion: 2023, sourceType: 'module', globals: browser },
   },
   {
-    files: ['tests/**/*.js', '*.config.js'],
+    files: ['tests/**/*.js', 'scripts/**/*.{js,mjs}', '*.config.js'],
     languageOptions: {
       ecmaVersion: 2023,
       sourceType: 'module',
-      globals: { ...browser, process: 'readonly' },
+      globals: { ...browser, process: 'readonly', console: 'readonly' },
     },
   },
 ];

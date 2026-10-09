@@ -1,0 +1,129 @@
+/* Drivers chart, slope chart, deep dive, tables and footer */
+
+/* Drivers Chart */
+.row-label {
+  fill: #9ca3af;
+  font-size: 11px;
+}
+.row-label.is-selected {
+  fill: #fff;
+  font-weight: 600;
+}
+.row-total {
+  fill: #d1d5db;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+/* Slope Chart */
+.slope {
+  cursor: pointer;
+}
+.slope-head {
+  fill: var(--color-muted);
+  font-size: 12px;
+  font-weight: 600;
+}
+.slope-axis {
+  stroke: #252b38;
+  stroke-width: 1px;
+}
+.slope-line {
+  stroke-width: 1.5px;
+  opacity: 0.55;
+  transition: opacity 0.2s, stroke-width 0.2s;
+}
+.slope:hover .slope-line, .slope.is-focus .slope-line, .slope.is-selected .slope-line {
+  opacity: 1;
+  stroke-width: 3px;
+}
+.slope-label {
+  font-size: 11px;
+  font-weight: 500;
+}
+
+/* Deep Dive */
+.iqr-band {
+  fill: rgba(255, 255, 255, 0.05);
+}
+.median-line {
+  fill: none;
+  stroke: rgba(255, 255, 255, 0.2);
+  stroke-width: 1.5px;
+  stroke-dasharray: 3, 3;
+}
+.band-label {
+  fill: rgba(255, 255, 255, 0.3);
+  font-size: 10px;
+}
+.series-line {
+  fill: none;
+  stroke-width: 2.5px;
+}
+.series-label {
+  font-size: 11px;
+  font-weight: 600;
+}
+.year-marker {
+  stroke: rgba(242, 193, 78, 0.4);
+  stroke-width: 1px;
+  stroke-dasharray: 2, 2;
+}
+.crosshair {
+  stroke: rgba(255, 255, 255, 0.3);
+  stroke-width: 1px;
+}
+
+/* Tables */
+.table-toggle {
+  margin-top: 1rem;
+}
+.table-toggle summary {
+  color: var(--color-muted);
+  font-size: 0.8rem;
+  cursor: pointer;
+  user-select: none;
+}
+.table-wrap {
+  margin-top: 0.75rem;
+  max-height: 280px;
+  overflow-y: auto;
+  border: 1px solid var(--color-border);
+  border-radius: 0.5rem;
+}
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.8rem;
+  text-align: left;
+}
+.data-table caption {
+  display: none;
+}
+.data-table th, .data-table td {
+  padding: 0.5rem 0.75rem;
+  border-bottom: 1px solid #1a202c;
+}
+.data-table th {
+  background: var(--color-surface);
+  position: sticky;
+  top: 0;
+  color: #fff;
+}
+
+/* Footer */
+.site-footer {
+  border-top: 1px solid var(--color-border);
+  font-size: 0.85rem;
+  color: var(--color-muted);
+}
+.site-footer h2 {
+  color: #fff;
+}
+.site-footer a {
+  color: var(--color-accent);
+  text-decoration: none;
+}
+.site-footer a:hover {
+  text-decoration: underline;
+}
