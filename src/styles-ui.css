@@ -1,0 +1,238 @@
+/* Site header, sticky filter bar, controls, inputs, chips, tooltips */
+
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: rgba(11, 13, 18, 0.85);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.filter-bar {
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  font-size: 0.875rem;
+}
+
+.ctrl-btn {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  color: var(--color-text);
+  padding: 0.35rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  transition: all 0.15s ease;
+}
+.ctrl-btn:hover {
+  background: var(--color-surface-hover);
+  border-color: #3b455b;
+}
+
+.icon-btn {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  color: var(--color-text);
+  width: 2rem;
+  height: 2rem;
+  border-radius: 9999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 0.75rem;
+  transition: all 0.15s ease;
+}
+.icon-btn:hover {
+  background: var(--color-accent);
+  color: #000;
+  border-color: var(--color-accent);
+}
+
+.year-slider {
+  width: 110px;
+  cursor: pointer;
+  accent-color: var(--color-accent);
+}
+
+.year-out {
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  color: var(--color-accent);
+  min-width: 2.5rem;
+}
+
+.search {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  color: #fff;
+  border-radius: 9999px;
+  padding: 0.3rem 0.85rem;
+  font-size: 0.8rem;
+  outline: none;
+  width: 140px;
+  transition: width 0.2s, border-color 0.2s;
+}
+.search:focus {
+  width: 180px;
+  border-color: var(--color-accent);
+}
+
+.chips {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  padding: 0.2rem 0.55rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  color: #fff;
+}
+.chip .swatch {
+  width: 7px;
+  height: 7px;
+  border-radius: 9999px;
+  background-color: var(--chip, var(--color-accent));
+}
+.chip button {
+  background: none;
+  border: none;
+  color: var(--color-muted);
+  cursor: pointer;
+  font-size: 1rem;
+  line-height: 1;
+  padding: 0 0.15rem;
+}
+.chip button:hover {
+  color: #fff;
+}
+.chip-empty {
+  font-size: 0.75rem;
+  color: var(--color-muted);
+}
+
+/* Copy Link Button feedback */
+#copy-link .when-copied,
+#copy-link .when-error {
+  display: none;
+}
+#copy-link[data-state='copied'] .when-idle {
+  display: none;
+}
+#copy-link[data-state='copied'] .when-copied {
+  display: inline;
+  color: #2bb3a0;
+}
+#copy-link[data-state='error'] .when-idle {
+  display: none;
+}
+#copy-link[data-state='error'] .when-error {
+  display: inline;
+  color: #e8774a;
+}
+
+/* Popover */
+.popover {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 0.75rem;
+  padding: 1rem;
+  color: var(--color-text);
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+  margin-top: 0.5rem;
+  max-width: 280px;
+}
+.popover::backdrop {
+  background: rgba(0, 0, 0, 0.4);
+}
+.check {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.8rem;
+  cursor: pointer;
+  padding: 0.25rem 0.4rem;
+  border-radius: 0.25rem;
+}
+.check:hover {
+  background: var(--color-surface-hover);
+}
+.swatch {
+  display: inline-block;
+  width: 9px;
+  height: 9px;
+  border-radius: 9999px;
+}
+.link-btn {
+  background: none;
+  border: none;
+  color: var(--color-accent);
+  font-size: 0.75rem;
+  cursor: pointer;
+  padding: 0;
+  text-decoration: underline;
+}
+
+/* Tooltip */
+.tooltip {
+  position: fixed;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  z-index: 100;
+  background: rgba(20, 24, 33, 0.95);
+  backdrop-filter: blur(8px);
+  border: 1px solid #2d3748;
+  border-radius: 0.5rem;
+  padding: 0.65rem 0.85rem;
+  font-size: 0.8rem;
+  color: #fff;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+  max-width: 240px;
+  line-height: 1.35;
+}
+.tooltip .tt-title {
+  font-weight: 600;
+  font-size: 0.9rem;
+  margin: 0 0 0.2rem 0;
+}
+.tooltip .tt-big {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--color-accent);
+  margin: 0;
+}
+.tooltip .tt-big span {
+  font-size: 0.8rem;
+  color: var(--color-muted);
+  font-weight: 400;
+}
+.tooltip .tt-muted {
+  color: var(--color-muted);
+  font-size: 0.75rem;
+  margin: 0.2rem 0 0 0;
+}
+.tooltip .tt-hint {
+  color: #93c5fd;
+  font-size: 0.7rem;
+  margin-top: 0.35rem;
+}
+.tooltip .tt-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin: 0.2rem 0;
+}

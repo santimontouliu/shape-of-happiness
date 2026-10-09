@@ -1,0 +1,28 @@
+{
+  "name": "shape-of-happiness",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "An interactive data story about what makes countries happy (World Happiness Report, 2005–2024).",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview --port 4173 --host 127.0.0.1",
+    "data": "python3 scripts/build_data.py",
+    "lint": "eslint .",
+    "test": "playwright test"
+  },
+  "dependencies": {
+    "d3": "^7.9.0",
+    "topojson-client": "^3.1.0",
+    "world-atlas": "^2.0.2"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@playwright/test": "^1.64.0",
+    "@tailwindcss/vite": "^4.3.3",
+    "eslint": "^10.12.0",
+    "tailwindcss": "^4.3.3",
+    "vite": "^8.3.4"
+  }
+}
