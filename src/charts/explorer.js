@@ -86,10 +86,12 @@ export function createExplorer(el, { data, store }) {
       .attr('r', (d) => Math.max(2.5, r(d.c.pop ?? 2e5)))
       .attr('opacity', (d) => (isSel(d) ? 1 : active(d) ? 0.78 : 0.08));
 
-    // Trails for selected countries across the factor years so far.
-    const trails = state.sel.map((id) => data.byId.get(id)).filter(Boolean).map((c) => ({
-      c, pts: data.factorYears.filter((yy) => yy <= ey).map((yy) => data.get(c, yy)).filter((v) => v?.[f.key] != null),
-    }));
+    // Trails for selected countries across the factor years so far (optional via toggle).
+    const trails = state.trails
+      ? state.sel.map((id) => data.byId.get(id)).filter(Boolean).map((c) => ({
+          c, pts: data.factorYears.filter((yy) => yy <= ey).map((yy) => data.get(c, yy)).filter((v) => v?.[f.key] != null),
+        }))
+      : [];
     gTrails.selectAll('path').data(trails, (d) => d.c.id).join('path').attr('class', 'trail')
       .attr('stroke', (d) => d.c.region.color)
       .transition().duration(t)

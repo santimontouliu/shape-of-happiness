@@ -32,6 +32,11 @@
   background: var(--color-surface-hover);
   border-color: #3b455b;
 }
+.ctrl-btn[aria-pressed='true'] {
+  background: #252d3d;
+  color: #fff;
+  border-color: #4a5568;
+}
 
 .icon-btn {
   background: var(--color-surface);

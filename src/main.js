@@ -22,7 +22,7 @@ async function main() {
   });
   const data = prepare(raw);
   const store = createStore(
-    { year: data.years.at(-1), x: 'social', sel: [FEATURED, 'FIN'] },
+    { year: data.years.at(-1), x: 'social', sel: [FEATURED, 'FIN'], trails: false },
     {
       years: new Set(data.years),
       factors: new Set(FACTORS.map((f) => f.key)),

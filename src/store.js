@@ -12,11 +12,13 @@ function parseHash(defaults, valid) {
   const x = p.get('x');
   const regions = (p.get('r') || '').split(',').filter((r) => valid.regions.has(r));
   const sel = (p.get('c') || '').split(',').map((s) => s.toUpperCase()).filter((id) => valid.countries.has(id));
+  const trails = p.has('trails') ? p.get('trails') === '1' : Boolean(defaults.trails);
   return {
     year: valid.years.has(year) ? year : defaults.year,
     x: valid.factors.has(x) ? x : defaults.x,
     regions,
     sel: p.has('c') ? sel.slice(0, MAX_SELECTED) : defaults.sel,
+    trails,
   };
 }
 
@@ -28,6 +30,7 @@ function writeHash() {
     p.set('x', state.x);
     if (state.regions.length) p.set('r', state.regions.join(','));
     p.set('c', state.sel.join(','));
+    if (state.trails) p.set('trails', '1');
     history.replaceState(null, '', `#${p.toString().replace(/%2C/g, ',')}`);
   }, 150);
 }

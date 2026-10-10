@@ -97,6 +97,14 @@ export function initControls({ data, store }) {
     if (btn) store.toggle(btn.dataset.remove);
   });
 
+  // History trails toggle for explorer.
+  const trailsBtn = $('#toggle-trails');
+  if (trailsBtn) {
+    trailsBtn.addEventListener('click', () => {
+      store.set({ trails: !store.get().trails });
+    });
+  }
+
   function sync(state) {
     const i = years.indexOf(state.year);
     slider.value = i;
@@ -107,6 +115,9 @@ export function initControls({ data, store }) {
     legend.querySelectorAll('[data-region]').forEach((b) => b.setAttribute('aria-pressed', String(state.regions.includes(b.dataset.region))));
     $('#region-count').textContent = state.regions.length ? `${state.regions.length} of ${REGIONS.length}` : 'All';
     picker.querySelectorAll('input').forEach((inp) => (inp.checked = inp.value === state.x));
+    if (trailsBtn) {
+      trailsBtn.setAttribute('aria-pressed', String(Boolean(state.trails)));
+    }
     chips.innerHTML = state.sel.map((id, k) => {
       const c = data.byId.get(id);
       return `<span class="chip" style="--chip:${SLOT_COLORS[k]}"><span class="swatch"></span>${esc(c.name)}
