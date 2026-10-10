@@ -16,6 +16,11 @@
   color-scheme: dark;
 }
 
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 6.5rem;
+}
+
 body {
   background-color: var(--color-bg);
   color: var(--color-text);

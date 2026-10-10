@@ -21,4 +21,9 @@ export default defineConfig({
       use: { ...devices['Pixel 5'] },
     },
   ],
+  webServer: {
+    command: 'npm run preview',
+    url: 'http://127.0.0.1:4173',
+    reuseExistingServer: true,
+  },
 });

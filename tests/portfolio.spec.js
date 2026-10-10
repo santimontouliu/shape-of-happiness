@@ -67,4 +67,23 @@ test.describe('The Shape of Happiness', () => {
     await expect(chips.first()).toContainText('Uruguay');
     await expect(chips.nth(1)).toContainText('Iceland');
   });
+
+  test('nav link clicks scroll to section with title fully visible below header', async ({ page, isMobile }) => {
+    test.skip(isMobile, 'Desktop navigation is hidden on mobile');
+    await page.goto('/');
+    await page.waitForSelector('html.is-ready');
+
+    await page.click('nav a[href="#map"]');
+    await page.waitForTimeout(600);
+
+    const mapKicker = page.locator('#map .kicker');
+    const box = await mapKicker.boundingBox();
+    const headerBox = await page.locator('.site-header').boundingBox();
+
+    // The kicker and title must be clearly below the sticky header
+    expect(box.y).toBeGreaterThanOrEqual(headerBox.y + headerBox.height);
+    await page.screenshot({
+      path: '/Users/santimontouliu/.gemini/antigravity/brain/d53f86ca-8416-40c4-95b8-6ec2b94b998e/test-scroll-map.png',
+    });
+  });
 });
