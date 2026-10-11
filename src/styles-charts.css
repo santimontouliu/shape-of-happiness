@@ -4,7 +4,7 @@
   padding-top: 5rem;
   padding-bottom: 5rem;
   border-bottom: 1px solid var(--color-border);
-  scroll-margin-top: 6.5rem;
+  scroll-margin-top: 0;
 }
 @media (min-width: 1024px) {
   .chapter {
@@ -15,7 +15,7 @@
   }
   .chapter-text {
     position: sticky;
-    top: 7.5rem;
+    top: var(--header-height, 7.5rem);
   }
 }
 
@@ -33,7 +33,7 @@
   padding-top: 4rem;
   padding-bottom: 5rem;
   text-align: center;
-  scroll-margin-top: 6.5rem;
+  scroll-margin-top: 0;
 }
 .hero .dek {
   margin-left: auto;
