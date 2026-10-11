@@ -8,7 +8,8 @@ const M = { top: 20, right: 120, bottom: 32, left: 40 };
 
 export function createDeepDive(el, tableEl, { data, store }) {
   const { years } = data;
-  const band = years.map((yr) => {
+  const calendarYears = d3.range(years[0], years.at(-1) + 1);
+  const band = calendarYears.map((yr) => {
     const s = data.rows(yr).map((r) => r.score).sort(d3.ascending);
     return { yr, q1: d3.quantileSorted(s, 0.25), med: d3.quantileSorted(s, 0.5), q3: d3.quantileSorted(s, 0.75) };
   });
@@ -19,7 +20,7 @@ export function createDeepDive(el, tableEl, { data, store }) {
   const marker = svg.append('line').attr('class', 'year-marker');
   const cross = svg.append('line').attr('class', 'crosshair').attr('opacity', 0);
   const x = d3.scaleLinear().domain(d3.extent(years));
-  const y = d3.scaleLinear().domain([2, 8]);
+  const y = d3.scaleLinear().domain([0, 10]);
   let W = 0;
   let H = 0;
 
@@ -40,18 +41,18 @@ export function createDeepDive(el, tableEl, { data, store }) {
 
     gBand.selectAll('*').remove();
     gBand.append('path').attr('class', 'iqr-band')
-      .attr('d', d3.area().x((d) => x(d.yr)).y0((d) => y(d.q1)).y1((d) => y(d.q3)).curve(d3.curveMonotoneX)(band));
+      .attr('d', d3.area().defined((d) => d.q1 != null).x((d) => x(d.yr)).y0((d) => y(d.q1)).y1((d) => y(d.q3)).curve(d3.curveMonotoneX)(band));
     gBand.append('path').attr('class', 'median-line')
-      .attr('d', d3.line().x((d) => x(d.yr)).y((d) => y(d.med)).curve(d3.curveMonotoneX)(band));
+      .attr('d', d3.line().defined((d) => d.med != null).x((d) => x(d.yr)).y((d) => y(d.med)).curve(d3.curveMonotoneX)(band));
     gBand.append('text').attr('class', 'band-label').attr('x', x(years.at(-1)) + 8).attr('y', y(band.at(-1).med) + 4)
       .text('World median');
 
     const series = state.sel.map((id, i) => {
       const c = data.byId.get(id);
-      return c && { c, color: SLOT_COLORS[i], pts: c.series.filter((v) => v?.score != null) };
+      return c && { c, color: SLOT_COLORS[i], pts: calendarYears.map((year) => data.get(c, year) ?? { year, score: null }), last: c.series.filter((v) => v?.score != null).at(-1) };
     }).filter(Boolean);
 
-    const line = d3.line().x((v) => x(v.year)).y((v) => y(v.score)).curve(d3.curveMonotoneX);
+    const line = d3.line().defined((v) => v.score != null).x((v) => x(v.year)).y((v) => y(v.score)).curve(d3.curveMonotoneX);
     const g = gLines.selectAll('g.series').data(series, (s) => s.c.id)
       .join((enter) => enter.append('g').attr('class', 'series')
         .call((e) => e.append('path').attr('class', 'series-line'))
@@ -60,9 +61,9 @@ export function createDeepDive(el, tableEl, { data, store }) {
       .attr('stroke-dasharray', function () { return `${this.getTotalLength()} ${this.getTotalLength()}`; })
       .attr('stroke-dashoffset', function () { return t ? this.getTotalLength() : 0; })
       .transition().duration(t * 1.6).ease(d3.easeCubicOut).attr('stroke-dashoffset', 0);
-    g.select('.series-label').attr('fill', (s) => s.color).attr('x', (s) => x(s.pts.at(-1).year) + 8)
-      .attr('y', (s, i) => y(s.pts.at(-1).score) + 4 + labelNudge(series, i))
-      .text((s) => `${s.c.name} · ${fmt.ordinal(s.pts.at(-1).rank)}`);
+    g.select('.series-label').attr('fill', (s) => s.color).attr('x', (s) => x(s.last.year) + 8)
+      .attr('y', (s, i) => y(s.last.score) + 4 + labelNudge(series, i))
+      .text((s) => `${W < 520 ? s.c.id : s.c.name} · ${fmt.ordinal(s.last.rank)}`);
 
     marker.attr('x1', x(state.year)).attr('x2', x(state.year)).attr('y1', M.top).attr('y2', H - M.bottom);
     svg.attr('aria-label', `Line chart of happiness over time for ${series.map((s) => s.c.name).join(', ') || 'no countries'}, compared with the world median.`);
@@ -70,13 +71,13 @@ export function createDeepDive(el, tableEl, { data, store }) {
       { label: 'Year', value: (yr) => yr },
       ...series.map((s) => ({ label: s.c.name, value: (yr) => fmt.score(data.get(s.c, yr)?.score) })),
       { label: 'World median', value: (yr) => fmt.score(band.find((b) => b.yr === yr).med) },
-    ], [...years].reverse());
+    ], [...calendarYears].reverse());
     return series;
   }
 
   // Keep end labels from colliding.
   function labelNudge(series, i) {
-    const ys = series.map((s) => y(s.pts.at(-1).score));
+    const ys = series.map((s) => y(s.last.score));
     let nudge = 0;
     for (let j = 0; j < i; j++) if (Math.abs(ys[i] + nudge - ys[j]) < 14) nudge += ys[i] >= ys[j] ? 14 : -14;
     return nudge;

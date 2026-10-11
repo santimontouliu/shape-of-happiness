@@ -1,7 +1,7 @@
 // Tiny pub/sub store whose state is mirrored in the URL hash, so every view
 // is a shareable deep link, e.g. #year=2025&x=social&r=lac&c=URY,FIN
 
-const MAX_SELECTED = 3;
+export const MAX_SELECTED = 3;
 const listeners = new Set();
 let state;
 let hashTimer;
@@ -11,7 +11,7 @@ function parseHash(defaults, valid) {
   const year = Number(p.get('year'));
   const x = p.get('x');
   const regions = (p.get('r') || '').split(',').filter((r) => valid.regions.has(r));
-  const sel = (p.get('c') || '').split(',').map((s) => s.toUpperCase()).filter((id) => valid.countries.has(id));
+  const sel = [...new Set((p.get('c') || '').split(',').map((s) => s.toUpperCase()).filter((id) => valid.countries.has(id)))];
   const trails = p.has('trails') ? p.get('trails') === '1' : Boolean(defaults.trails);
   return {
     year: valid.years.has(year) ? year : defaults.year,
@@ -22,9 +22,9 @@ function parseHash(defaults, valid) {
   };
 }
 
-function writeHash() {
+function writeHash(immediate = false) {
   clearTimeout(hashTimer);
-  hashTimer = setTimeout(() => {
+  const write = () => {
     const p = new URLSearchParams();
     p.set('year', state.year);
     p.set('x', state.x);
@@ -32,7 +32,9 @@ function writeHash() {
     p.set('c', state.sel.join(','));
     if (state.trails) p.set('trails', '1');
     history.replaceState(null, '', `#${p.toString().replace(/%2C/g, ',')}`);
-  }, 150);
+  };
+  if (immediate) write();
+  else hashTimer = setTimeout(write, 150);
 }
 
 export function createStore(defaults, valid) {
@@ -42,6 +44,7 @@ export function createStore(defaults, valid) {
 
   const store = {
     get: () => state,
+    flushUrl: () => writeHash(true),
     set(patch) {
       const changed = new Set(Object.keys(patch).filter((k) => patch[k] !== state[k]));
       if (!changed.size) return;
@@ -53,15 +56,21 @@ export function createStore(defaults, valid) {
       listeners.add(fn);
       return () => listeners.delete(fn);
     },
-    /** Toggle a country in the comparison set (oldest drops out past 3). */
+    /** Keep existing choices when the comparison is full, from every entry point. */
     toggle(id) {
+      if (!valid.countries.has(id)) return false;
+      if (!state.sel.includes(id) && state.sel.length >= MAX_SELECTED) {
+        store.set({ selectionMessage: 'You are comparing 3 countries. Remove one before adding another.' });
+        return false;
+      }
       const sel = state.sel.includes(id)
         ? state.sel.filter((s) => s !== id)
-        : [...state.sel, id].slice(-MAX_SELECTED);
-      store.set({ sel });
+        : [...state.sel, id];
+      store.set({ sel, selectionMessage: '' });
+      return true;
     },
     add(id) {
-      if (!state.sel.includes(id)) store.toggle(id);
+      return state.sel.includes(id) || store.toggle(id);
     },
   };
 

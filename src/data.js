@@ -69,7 +69,7 @@ export const fmt = {
 /** Pearson correlation for paired arrays. */
 export function pearson(xs, ys) {
   const n = xs.length;
-  if (n < 3) return 0;
+  if (n < 3) return NaN;
   const mx = xs.reduce((a, b) => a + b, 0) / n;
   const my = ys.reduce((a, b) => a + b, 0) / n;
   let num = 0, dx = 0, dy = 0;

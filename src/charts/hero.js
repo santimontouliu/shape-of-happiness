@@ -27,8 +27,9 @@ export function createHero(el, statsEl, { data, store, featured }) {
 
     svg.selectAll('g.hero-axis').data([0]).join('g').attr('class', 'axis hero-axis')
       .attr('transform', `translate(0,${H - 22})`)
-      .call(d3.axisBottom(x).ticks(7).tickSize(0).tickPadding(8).tickFormat((d) => (d === 1 ? 'Less happy  1' : d === 8 ? '8  Happier' : d)))
-      .call((g) => g.select('.domain').remove());
+      .call(d3.axisBottom(x).tickValues(W < 640 ? [1, 3, 5, 8] : [1, 2, 3, 4, 5, 6, 7, 8]).tickSize(0).tickPadding(8).tickFormat((d) => (d === 1 ? 'Less happy  1' : d === 8 ? '8  Happier' : d)))
+      .call((g) => g.select('.domain').remove())
+      .call((g) => g.selectAll('.tick text').attr('text-anchor', (d) => d === 1 ? 'start' : d === 8 ? 'end' : 'middle'));
 
     const dots = svg.selectAll('circle.hero-dot').data(nodes, (d) => d.r.c.id)
       .join('circle').attr('class', 'hero-dot').attr('r', R)
@@ -39,8 +40,7 @@ export function createHero(el, statsEl, { data, store, featured }) {
       .on('pointermove', (event) => tooltip.move(event))
       .on('pointerleave', () => tooltip.hide())
       .on('click', (_, d) => {
-        store.add(d.r.c.id);
-        document.getElementById('compare').scrollIntoView({ behavior: 'smooth' });
+        if (store.add(d.r.c.id)) document.getElementById('compare').scrollIntoView({ behavior: 'smooth' });
       });
 
     if (!played && dur()) {
@@ -53,10 +53,13 @@ export function createHero(el, statsEl, { data, store, featured }) {
     }
 
     const notes = [d3.greatest(nodes, (d) => d.r.score), nodes.find((d) => d.r.c.id === featured), d3.least(nodes, (d) => d.r.score)]
-      .filter(Boolean);
+      .filter((d) => d && (W >= 640 || d.r.c.id !== featured));
+    svg.selectAll('line.hero-leader').data(W < 640 ? notes : [], (d) => d.r.c.id).join('line')
+      .attr('class', 'hero-leader').attr('x1', (d) => d.x).attr('x2', (d) => d.x)
+      .attr('y1', 30).attr('y2', (d) => d.y - R - 4).attr('stroke', 'var(--color-muted)').attr('stroke-opacity', 0.5);
     svg.selectAll('text.hero-note').data(notes, (d) => d.r.c.id).join('text')
       .attr('class', (d) => `hero-note${d.r.c.id === featured ? ' is-featured' : ''}`)
-      .attr('x', (d) => d.x).attr('y', (d) => d.y - R - 8)
+      .attr('x', (d) => d.x).attr('y', (d) => W < 640 ? 24 : d.y - R - 8)
       .attr('text-anchor', (d) => (d.x > W - 80 ? 'end' : d.x < 80 ? 'start' : 'middle'))
       .text((d) => d.r.c.name);
   }
@@ -75,7 +78,7 @@ function renderStats(el, data, year, featured) {
   const f = data.byId.get(featured);
   const fv = f && data.get(f, year);
   const stats = [
-    { big: rows.length, label: `countries surveyed by Gallup in ${year}` },
+    { big: rows.length, label: `countries in the ${year - 2}–${year} ranking` },
     { big: top.c.name, label: `#1 for ${streak} editions in a row` },
     fv && { big: `#${fv.rank}`, label: `${f.name}, the happiest-ranked in ${f.region.name.split(' &')[0]}?`, id: 'featured' },
   ].filter(Boolean);

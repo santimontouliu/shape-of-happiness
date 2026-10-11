@@ -31,8 +31,9 @@ export function factorInsight(data, state, year) {
   const f = FACTORS.find((d) => d.key === state.x);
   const rows = data.rows(year).filter((r) => r[f.key] != null && regionActive(state, r.c));
   const r = pearson(rows.map((d) => d[f.key]), rows.map((d) => d.score));
+  if (!Number.isFinite(r)) return `Not enough variation or data to calculate a correlation for ${f.label.toLowerCase()} in ${year}.`;
   const strength = Math.abs(r) > 0.7 ? 'strongly' : Math.abs(r) > 0.4 ? 'moderately' : 'only weakly';
-  return `Across ${rows.length} countries in ${year}, ${strong(f.label.toLowerCase())} is ${strength} linked to happiness (r = ${strong(r.toFixed(2))}). Look for countries far above the trend: they're happier than this factor alone predicts.`;
+  return `Across ${rows.length} countries in ${year}, the ${strong(f.label)} contribution is ${strength} linked to happiness (r = ${strong(r.toFixed(2))}). Countries above the fitted trend report higher scores than the line suggests. Association does not establish causation.`;
 }
 
 export function moversInsight(rise, fall) {

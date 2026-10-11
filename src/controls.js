@@ -7,6 +7,16 @@ const $ = (sel) => document.querySelector(sel);
 
 export function initControls({ data, store }) {
   const { years } = data;
+  const filterToggle = $('#filter-toggle');
+  filterToggle.addEventListener('click', () => {
+    const open = filterToggle.getAttribute('aria-expanded') !== 'true';
+    filterToggle.setAttribute('aria-expanded', String(open));
+    $('#filter-panel').classList.toggle('is-open', open);
+  });
+  const header = document.querySelector('.site-header');
+  new ResizeObserver(() => {
+    document.documentElement.style.setProperty('--header-height', `${header.getBoundingClientRect().height + 12}px`);
+  }).observe(header);
   const slider = $('#year');
   const out = $('#year-out');
   slider.max = years.length - 1;
@@ -78,8 +88,7 @@ export function initControls({ data, store }) {
   const tryAdd = () => {
     const c = byName.get(search.value.trim().toLowerCase());
     if (c) {
-      store.add(c.id);
-      search.value = '';
+      if (store.add(c.id)) search.value = '';
     }
   };
   search.addEventListener('change', tryAdd);
@@ -106,6 +115,8 @@ export function initControls({ data, store }) {
   }
 
   function sync(state) {
+    $('#selection-status').textContent = state.selectionMessage || '';
+    $('#selection-status').hidden = !state.selectionMessage;
     const i = years.indexOf(state.year);
     slider.value = i;
     slider.setAttribute('aria-valuetext', String(state.year));

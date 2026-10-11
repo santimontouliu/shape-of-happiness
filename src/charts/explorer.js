@@ -23,7 +23,7 @@ export function createExplorer(el, { data, store }) {
   const gLabels = svg.append('g').attr('pointer-events', 'none');
   const yearLabel = svg.append('text').attr('class', 'year-watermark').attr('aria-hidden', true);
   const x = d3.scaleLinear();
-  const y = d3.scaleLinear().domain([1.5, 8]);
+  const y = d3.scaleLinear().domain([0, 10]);
   const r = d3.scaleSqrt().domain([0, maxPop]);
   let W = 0;
   let H = 0;
@@ -54,7 +54,7 @@ export function createExplorer(el, { data, store }) {
         .call(d3.axisLeft(y).ticks(6).tickSize(-(W - M.left - M.right)).tickPadding(8))
         .call((g) => g.select('.domain').remove());
       gAxes.append('text').attr('class', 'axis-label').attr('x', W - M.right).attr('y', H - 8)
-        .attr('text-anchor', 'end').text(`${f.label} → (contribution to score)`);
+        .attr('text-anchor', 'end').text(`${f.short} contribution → (score points)`);
       gAxes.append('text').attr('class', 'axis-label').attr('x', M.left).attr('y', M.top - 4)
         .text('↑ Life evaluation (0–10)');
     }
@@ -125,7 +125,7 @@ export function createExplorer(el, { data, store }) {
     const fl = FACTORS.find((ff) => ff.key === f);
     tooltip.show(event, `<p class="tt-title">${esc(d.c.name)}</p>
       <p class="tt-big">${fmt.score(d.score)}<span>/10</span></p>
-      <p class="tt-muted">${esc(fl.label)}: ${d[f].toFixed(2)} · Pop. ${fmt.pop(d.c.pop)}</p>
+      <p class="tt-muted">${esc(fl.label)} contribution: ${d[f].toFixed(2)} points · Pop. ${fmt.pop(d.c.pop)}</p>
       <p class="tt-muted">${esc(d.c.region.name)}</p><p class="tt-hint">Click to compare</p>`);
   });
   const leave = () => {
@@ -154,5 +154,5 @@ function linreg(pts) {
   const mx = d3.mean(pts, (p) => p[0]);
   const my = d3.mean(pts, (p) => p[1]);
   const m = d3.sum(pts, (p) => (p[0] - mx) * (p[1] - my)) / d3.sum(pts, (p) => (p[0] - mx) ** 2);
-  return n ? { m, b: my - m * mx } : null;
+  return n && Number.isFinite(m) ? { m, b: my - m * mx } : null;
 }

@@ -28,10 +28,11 @@ test.describe('The Shape of Happiness', () => {
     await expect(chips.nth(1)).toContainText('Finland');
   });
 
-  test('country search adds a country chip and updates URL hash', async ({ page }) => {
+  test('country search adds a country chip and updates URL hash', async ({ page, isMobile }) => {
     await page.goto('/');
     await page.waitForSelector('html.is-ready');
 
+    if (isMobile) await page.getByRole('button', { name: 'Filters', exact: true }).click();
     const searchInput = page.locator('#search');
     await searchInput.fill('Argentina');
     await searchInput.press('Enter');
@@ -57,10 +58,11 @@ test.describe('The Shape of Happiness', () => {
     expect(Number(text)).toBeGreaterThanOrEqual(2011);
   });
 
-  test('deep links restore country and factor selection', async ({ page }) => {
+  test('deep links restore country and factor selection', async ({ page, isMobile }) => {
     await page.goto('/#year=2021&x=gdp&c=URY,ISL');
     await page.waitForSelector('html.is-ready');
 
+    if (isMobile) await page.getByRole('button', { name: 'Filters', exact: true }).click();
     await expect(page.locator('#year-out')).toHaveText('2021');
     const chips = page.locator('#chips .chip');
     await expect(chips).toHaveCount(2);
@@ -68,8 +70,7 @@ test.describe('The Shape of Happiness', () => {
     await expect(chips.nth(1)).toContainText('Iceland');
   });
 
-  test('nav link clicks scroll to section with title fully visible below header', async ({ page, isMobile }) => {
-    test.skip(isMobile, 'Desktop navigation is hidden on mobile');
+  test('nav link clicks scroll to section with title fully visible below header', async ({ page }) => {
     await page.goto('/');
     await page.waitForSelector('html.is-ready');
 
@@ -83,7 +84,7 @@ test.describe('The Shape of Happiness', () => {
     // The kicker and title must be clearly below the sticky header
     expect(box.y).toBeGreaterThanOrEqual(headerBox.y + headerBox.height);
     await page.screenshot({
-      path: '/Users/santimontouliu/.gemini/antigravity/brain/d53f86ca-8416-40c4-95b8-6ec2b94b998e/test-scroll-map.png',
+      path: test.info().outputPath('scroll-map.png'),
     });
   });
 });
