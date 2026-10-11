@@ -31,6 +31,7 @@ test('missing year is represented as a gap and unavailable table values', async 
   await open(page, isMobile);
   const path = await page.locator('#deepdive-chart .series-line').first().getAttribute('d');
   expect(path.match(/M/g).length).toBe(2);
+  await page.locator('#compare summary').click();
   const row = page.locator('#deepdive-table tbody tr').filter({ has: page.getByRole('rowheader', { name: '2013', exact: true }) });
   await expect(row).toContainText('—');
   await expect(page.locator('#hero-chart .hero-axis .tick text').first()).toHaveAttribute('text-anchor', 'start');
