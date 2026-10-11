@@ -127,3 +127,9 @@
 .site-footer a:hover {
   text-decoration: underline;
 }
+
+.table-wrap { overflow: auto; }
+.band-label { fill: #9ca3af; }
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+}

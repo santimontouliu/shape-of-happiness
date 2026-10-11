@@ -48,6 +48,18 @@ async function main() {
     $('#insight-explorer').innerHTML = factorInsight(data, state, ey);
     $('#insight-drivers').innerHTML = countryInsight(data, state, ey);
     $('#insight-compare').innerHTML = countryInsight(data, state, state.year);
+    $('#map-scope').textContent = `${state.year} · ${state.regions.length ? 'Selected regions' : 'All regions'}`;
+    $('#explorer-scope').textContent = `${ey} · ${state.regions.length ? 'Selected regions' : 'All regions'} · Factor contributions`;
+    $('#drivers-scope').textContent = `${ey} · Selected countries + unweighted world average`;
+    $('#compare-scope').textContent = `2011–2025 · Selected countries · Marker: ${state.year}`;
+    const factor = FACTORS.find((f) => f.key === state.x);
+    renderTable($('#explorer-table'), `${factor.label} contribution and life evaluation, ${ey}`, [
+      { label: 'Country', value: (r) => r.c.name },
+      { label: 'Score', value: (r) => fmt.score(r.score) },
+      { label: `${factor.label} contribution`, value: (r) => fmt.score(r[factor.key]) },
+      { label: 'Population (latest available)', value: (r) => fmt.pop(r.c.pop) },
+      { label: 'Region', value: (r) => r.c.region.name },
+    ], d3.sort(data.rows(ey).filter((r) => regionActive(state, r.c) && r[factor.key] != null), (r) => r.rank));
     const note = ey !== state.year ? `Factor breakdowns start in ${data.factorYears[0]}, so this chart shows ${ey}.` : '';
     document.querySelectorAll('[data-factor-note]').forEach((el) => {
       el.textContent = note;
@@ -69,6 +81,7 @@ async function main() {
   $('#copy-link').addEventListener('click', async (e) => {
     const btn = e.currentTarget;
     try {
+      store.flushUrl();
       await navigator.clipboard.writeText(location.href);
       btn.dataset.state = 'copied';
     } catch {
@@ -82,7 +95,8 @@ async function main() {
       const target = document.getElementById(targetId);
       if (target) {
         e.preventDefault();
-        target.scrollIntoView({ behavior: 'smooth' });
+        target.scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth' });
+        if (link.classList.contains('skip-link')) target.focus({ preventScroll: true });
       }
     });
   });

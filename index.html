@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>The Shape of Happiness · An interactive data story by Santi Montouliu</title>
-    <meta name="description" content="What makes a country happy? Explore 15 years of World Happiness Report data across 167 countries with interactive maps and charts." />
+    <meta name="description" content="What makes a country happy? Explore World Happiness Report data from 2011–2025 across 167 countries with interactive maps and charts." />
     <meta name="theme-color" content="#0b0d12" />
     <meta name="color-scheme" content="dark" />
     <meta property="og:type" content="website" />
@@ -25,9 +25,9 @@
     <a class="skip-link" href="#main">Skip to content</a>
 
     <header class="site-header">
-      <div class="wrap flex items-center justify-between gap-4 py-3">
+      <div class="wrap header-top flex items-center justify-between gap-4 py-3">
         <a href="#top" class="brand">The Shape of Happiness</a>
-        <nav aria-label="Chapters" class="hidden md:block">
+        <nav aria-label="Chapters" class="chapter-nav">
           <ul class="flex gap-5 text-sm">
             <li><a href="#map">Map</a></li>
             <li><a href="#explorer">Explorer</a></li>
@@ -47,6 +47,8 @@
             <input id="year" type="range" min="0" step="1" class="year-slider" />
             <output for="year" id="year-out" class="year-out" aria-live="polite"></output>
           </div>
+          <button id="filter-toggle" type="button" class="ctrl-btn" aria-expanded="false" aria-controls="filter-panel">Filters</button>
+          <div id="filter-panel">
           <div class="relative">
             <button type="button" class="ctrl-btn" popovertarget="region-pop">Regions: <span id="region-count">All</span></button>
             <div id="region-pop" popover class="popover">
@@ -59,18 +61,20 @@
           </div>
           <div class="flex items-center gap-2">
             <label for="search" class="sr-only">Add a country to compare</label>
-            <input id="search" type="search" list="country-list" placeholder="+ Add a country" autocomplete="off" class="search" />
+            <input id="search" type="search" list="country-list" placeholder="Add country" autocomplete="off" class="search" />
             <datalist id="country-list"></datalist>
           </div>
           <div id="chips" class="chips" aria-live="polite" aria-label="Countries being compared"></div>
-          <button type="button" id="copy-link" class="ctrl-btn ml-auto" aria-live="polite">
-            <span class="when-idle">Copy link to this view</span><span class="when-copied">Link copied ✓</span><span class="when-error">Copy failed</span>
+          <button type="button" id="copy-link" class="ctrl-btn ml-auto" aria-label="Copy link to this view" aria-live="polite">
+            <span class="when-idle">Copy link</span><span class="when-copied">Link copied ✓</span><span class="when-error">Copy failed</span>
           </button>
+          </div>
         </div>
       </div>
     </header>
+    <p id="selection-status" class="selection-status" role="status" hidden></p>
 
-    <main id="main">
+    <main id="main" tabindex="-1">
       <section id="top" class="hero wrap" aria-labelledby="hero-title">
         <p class="kicker">An interactive data story · World Happiness Report 2011–2025</p>
         <h1 id="hero-title" class="display">The Shape of Happiness</h1>
@@ -78,6 +82,7 @@
           Gallup asks people in 140+ countries to rate their lives from 0 (worst possible) to 10 (best possible).
           Below, every dot is a country. What separates the left from the right?
         </p>
+        <p class="chart-scope">Latest edition overview · 2023–2025 averages · WHR 2026 · All regions</p>
         <div id="hero-chart" class="hero-chart"></div>
         <dl id="hero-stats" class="stats"></dl>
         <a href="#map" class="scroll-cue">Start exploring <span aria-hidden="true">↓</span></a>
@@ -87,14 +92,15 @@
         <div class="chapter-text">
           <p class="kicker">01 · The map</p>
           <h2 id="map-title" class="title">Happiness has a geography</h2>
-          <p>The Nordics sit at the top year after year. Much of Sub-Saharan Africa and South Asia sits near the bottom. Press play to watch fifteen years go by, or click any country to add it to the comparison.</p>
+          <p>The Nordics sit at the top year after year. Much of Sub-Saharan Africa and South Asia sits near the bottom. Press play to explore 14 available rankings from 2011–2025 (2013 is absent from the source), or click any country to add it to the comparison.</p>
           <p id="insight-map" class="insight" aria-live="polite"></p>
         </div>
         <figure class="chapter-figure">
+          <p id="map-scope" class="chart-scope"></p>
           <div id="map-chart" class="chart"></div>
           <figcaption class="flex flex-wrap items-center justify-between gap-3">
             <div id="map-legend" class="legend" aria-hidden="true"></div>
-            <span class="caption">Life evaluation, 3-year average. Grey = no survey.</span>
+            <span class="caption">Life evaluation, 3-year average. Grey = no data.</span>
           </figcaption>
           <details class="table-toggle"><summary>View as table</summary><div id="map-table" class="table-wrap"></div></details>
         </figure>
@@ -104,7 +110,7 @@
         <div class="chapter-text">
           <p class="kicker">02 · The explorer</p>
           <h2 id="explorer-title" class="title">Money matters. But not alone.</h2>
-          <p>Pick a factor to put on the horizontal axis. Bubble size is population and colour is region. The dashed line is the trend, so countries above it are happier than that factor alone would predict.</p>
+          <p>Pick a factor’s estimated contribution to put on the horizontal axis, measured in happiness-score points. Bubble size uses the latest available population and colour shows region. The dashed line is a fitted trend, not a causal prediction.</p>
           <p id="insight-explorer" class="insight" aria-live="polite"></p>
         </div>
         <figure class="chapter-figure">
@@ -118,8 +124,10 @@
             </button>
           </div>
           <p class="note" data-factor-note hidden></p>
+          <p id="explorer-scope" class="chart-scope"></p>
           <div id="explorer-chart" class="chart"></div>
           <figcaption><div id="region-legend" class="legend-chips" aria-label="Filter by region"></div></figcaption>
+          <details class="table-toggle"><summary>View as table</summary><div id="explorer-table" class="table-wrap"></div></details>
         </figure>
       </section>
 
@@ -127,12 +135,13 @@
         <div class="chapter-text">
           <p class="kicker">03 · The drivers</p>
           <h2 id="drivers-title" class="title">Anatomy of a score</h2>
-          <p>The report splits each score into six measurable factors plus a baseline. Social support and income usually make up the biggest share. Click a factor in the legend to highlight it.</p>
+          <p>The report decomposes each score into six estimated factor contributions plus “Residual”: the Dystopia baseline and the unexplained remainder. Social support and income usually make up the biggest share. Click a factor in the legend to highlight it.</p>
           <p id="insight-drivers" class="insight" aria-live="polite"></p>
         </div>
         <figure class="chapter-figure">
           <p class="note" data-factor-note hidden></p>
           <div id="drivers-legend" class="legend-chips mb-3" aria-label="Highlight a factor"></div>
+          <p id="drivers-scope" class="chart-scope"></p>
           <div id="drivers-chart" class="chart"></div>
           <details class="table-toggle"><summary>View as table</summary><div id="drivers-table" class="table-wrap"></div></details>
         </figure>
@@ -146,6 +155,7 @@
           <p id="insight-movers" class="insight" aria-live="polite"></p>
         </div>
         <figure class="chapter-figure">
+          <p class="chart-scope">Fixed comparison · 2011, 2012, 2014 vs. 2023–2025</p>
           <div id="slope-chart" class="chart"></div>
         </figure>
       </section>
@@ -154,10 +164,12 @@
         <div class="chapter-text">
           <p class="kicker">05 · Your turn</p>
           <h2 id="compare-title" class="title">Compare countries over time</h2>
-          <p>Uruguay is pre-selected as my personal pick. Add up to three countries with the search box above and see how they compare with the middle 50% of the world, shown as the shaded band.</p>
+          <p>The default comparison starts with Uruguay, my personal pick, and Finland. Choose up to three countries using Filters above. The shaded band shows the middle 50% of countries with data in each year; every country has equal weight.</p>
           <p id="insight-compare" class="insight" aria-live="polite"></p>
         </div>
         <figure class="chapter-figure">
+          <p id="compare-scope" class="chart-scope"></p>
+          <p class="note">Gaps mean missing data, including 2013. Lines join available consecutive years; they are not annual observations. End labels show the latest available rank; small screens use country codes.</p>
           <div id="deepdive-chart" class="chart"></div>
           <details class="table-toggle"><summary>View as table</summary><div id="deepdive-table" class="table-wrap"></div></details>
         </figure>
@@ -178,7 +190,8 @@
         </div>
         <div>
           <h2 class="label mb-3">Method</h2>
-          <p>Scores are 3-year averages of the Cantril ladder question (0–10), labelled by their final survey year. Factor bars are the report's "explained by" contributions, which estimate how much each factor adds relative to a hypothetical lowest-scoring "Dystopia".</p>
+          <p>Scores are 3-year averages of the Cantril ladder question (0–10), labelled by their final survey year (2025 represents 2023–2025 in the 2026 report). The supplied workbook has no 2013 ranking. Factor bars are the report's "explained by" contributions, which estimate how much each factor adds relative to a hypothetical lowest-scoring "Dystopia".</p>
+          <p class="mt-3">World averages, medians and quartiles give equal weight to each country with a score; coverage can vary by year. Movers compare the mean of available ranking scores in 2011, 2012 and 2014 with 2023–2025, requiring at least one score in each period. These are averages of overlapping three-year averages. Selected countries remain visible outside the region filter.</p>
         </div>
         <div>
           <h2 class="label mb-3">Sources</h2>

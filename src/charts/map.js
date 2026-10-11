@@ -92,10 +92,10 @@ export function createMap(el, { data, store }) {
       .attr('class', 'country-selected')
       .attr('d', path);
 
-    const top = d3.greatest(data.rows(state.year), (r) => r.score);
+    const top = d3.greatest(data.rows(state.year).filter((r) => regionActive(state, r.c)), (r) => r.score);
     svg.attr(
       'aria-label',
-      `World map of happiness scores in ${state.year}. ${top ? `${top.c.name} is highest at ${fmt.score(top.score)}.` : ''} Use the country search or the table below for exact values.`,
+      `World map of happiness scores in ${state.year}. ${top ? `${top.c.name} is highest ${state.regions.length ? 'in the selected regions' : 'worldwide'} at ${fmt.score(top.score)}.` : ''} Use the country search or the table below for exact values.`,
     );
   }
 
@@ -112,8 +112,8 @@ export function drawLegend(el) {
   d3.range(0, 1.01, 0.1).forEach((t) =>
     grad.append('stop').attr('offset', `${t * 100}%`).attr('stop-color', scoreColor(3 + t * 4.8)),
   );
-  svg.append('rect').attr('x', 0).attr('y', 4).attr('width', w).attr('height', 10).attr('rx', 5).attr('fill', `url(#${id})`);
-  const x = d3.scaleLinear().domain([3, 7.8]).range([0, w]);
+  svg.append('rect').attr('x', 12).attr('y', 4).attr('width', w - 24).attr('height', 10).attr('rx', 5).attr('fill', `url(#${id})`);
+  const x = d3.scaleLinear().domain([3, 7.8]).range([12, w - 12]);
   svg.append('g').attr('transform', 'translate(0,18)').attr('class', 'axis')
     .call(d3.axisBottom(x).tickValues([3, 4, 5, 6, 7]).tickSize(0).tickPadding(6))
     .call((g) => g.select('.domain').remove());
