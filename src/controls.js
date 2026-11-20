@@ -137,7 +137,16 @@ export function initControls({ data, store }) {
   }
 
   store.subscribe((s, changed) => {
-    if (!(changed.size === 1 && changed.has('hover'))) sync(s);
+    if ([...changed].some((key) => !['hover', 'chapter', 'focus'].includes(key))) sync(s);
   });
   sync(store.get());
+  return {
+    prepareView() {
+      stopPlay();
+      search.value = '';
+      $('#region-pop').hidePopover();
+      filterToggle.setAttribute('aria-expanded', 'false');
+      $('#filter-panel').classList.remove('is-open');
+    },
+  };
 }

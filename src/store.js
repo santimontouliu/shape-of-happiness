@@ -1,6 +1,7 @@
 // Tiny pub/sub store whose state is mirrored in the URL hash, so every view
 // is a shareable deep link, e.g. #year=2025&x=social&r=lac&c=URY,FIN
 
+export const CHAPTERS = ['top', 'map', 'explorer', 'drivers', 'movers', 'compare'];
 export const MAX_SELECTED = 3;
 const listeners = new Set();
 let state;
@@ -8,6 +9,7 @@ let hashTimer;
 
 function parseHash(defaults, valid) {
   const p = new URLSearchParams(location.hash.slice(1));
+  const chapter = p.get('chapter') || location.hash.slice(1);
   const year = Number(p.get('year'));
   const x = p.get('x');
   const regions = (p.get('r') || '').split(',').filter((r) => valid.regions.has(r));
@@ -19,6 +21,8 @@ function parseHash(defaults, valid) {
     regions,
     sel: p.has('c') ? sel.slice(0, MAX_SELECTED) : defaults.sel,
     trails,
+    chapter: CHAPTERS.includes(chapter) ? chapter : 'top',
+    focus: valid.factors.has(p.get('focus')) || p.get('focus') === 'dystopia' ? p.get('focus') : null,
   };
 }
 
@@ -31,6 +35,8 @@ function writeHash(immediate = false) {
     if (state.regions.length) p.set('r', state.regions.join(','));
     p.set('c', state.sel.join(','));
     if (state.trails) p.set('trails', '1');
+    p.set('chapter', state.chapter);
+    if (state.focus) p.set('focus', state.focus);
     history.replaceState(null, '', `#${p.toString().replace(/%2C/g, ',')}`);
   };
   if (immediate) write();
@@ -44,6 +50,10 @@ export function createStore(defaults, valid) {
 
   const store = {
     get: () => state,
+    reset(patch = {}) {
+      store.set({ ...defaults, regions: [], trails: false, chapter: 'top', focus: null,
+        hover: null, selectionMessage: '', ...patch });
+    },
     flushUrl: () => writeHash(true),
     set(patch) {
       const changed = new Set(Object.keys(patch).filter((k) => patch[k] !== state[k]));

@@ -43,7 +43,7 @@ export function createHero(el, statsEl, { data, store, featured }) {
       .on('pointermove', (event) => tooltip.move(event))
       .on('pointerleave', () => tooltip.hide())
       .on('click', (_, d) => {
-        if (store.add(d.r.c.id)) document.getElementById('compare').scrollIntoView({ behavior: 'smooth' });
+        if (store.add(d.r.c.id)) document.querySelector('nav a[href="#compare"]').click();
       });
 
     if (!played && dur()) {

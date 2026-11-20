@@ -65,6 +65,7 @@
             <datalist id="country-list"></datalist>
           </div>
           <div id="chips" class="chips" aria-live="polite" aria-label="Countries being compared"></div>
+          <button type="button" id="reset-view" class="ctrl-btn">Reset view</button>
           <button type="button" id="copy-link" class="ctrl-btn ml-auto" aria-label="Copy link to this view" aria-live="polite">
             <span class="when-idle">Copy link</span><span class="when-copied">Link copied ✓</span><span class="when-error">Copy failed</span>
           </button>
@@ -85,6 +86,14 @@
         <p class="chart-scope">Latest edition overview · 2023–2025 averages · WHR 2026 · All regions</p>
         <div id="hero-chart" class="hero-chart"></div>
         <dl id="hero-stats" class="stats"></dl>
+        <div class="guided-starts" role="group" aria-labelledby="guided-title">
+          <p id="guided-title" class="label">Start with a question</p>
+          <div class="guided-grid">
+            <button type="button" data-preset="compare"><strong>Uruguay vs. Finland</strong><span>Compare their paths over time →</span></button>
+            <button type="button" data-preset="explorer"><strong>Does money explain happiness?</strong><span>Explore income and life evaluation →</span></button>
+            <button type="button" data-preset="movers"><strong>Biggest risers and fallers</strong><span>See how rankings changed since 2011 →</span></button>
+          </div>
+        </div>
         <a href="#map" class="scroll-cue">Start exploring <span aria-hidden="true">↓</span></a>
       </section>
 
