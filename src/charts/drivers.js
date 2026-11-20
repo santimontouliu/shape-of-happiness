@@ -12,7 +12,7 @@ export function createDrivers(el, legendEl, tableEl, { data, store }) {
   const gRows = svg.append('g');
   const x = d3.scaleLinear().domain([0, 8]);
   let W = 0;
-  let focus = null;
+
 
   // Legend doubles as a highlight toggle (real buttons, keyboard friendly).
   const legend = d3.select(legendEl);
@@ -20,9 +20,7 @@ export function createDrivers(el, legendEl, tableEl, { data, store }) {
     .attr('type', 'button').attr('class', 'legend-chip').attr('aria-pressed', 'false')
     .html((p) => `<span class="swatch" style="background:${p.color}"></span>${esc(p.short)}`)
     .on('click', (event, p) => {
-      focus = focus === p.key ? null : p.key;
-      legend.selectAll('button').attr('aria-pressed', (q) => String(q.key === focus));
-      render(store.get(), 0);
+      store.set({ focus: store.get().focus === p.key ? null : p.key });
     });
 
   function rowsFor(state, year) {
@@ -39,6 +37,8 @@ export function createDrivers(el, legendEl, tableEl, { data, store }) {
   }
 
   function render(state, t = dur(650)) {
+    const focus = state.focus;
+    legend.selectAll('button').attr('aria-pressed', (q) => String(q.key === focus));
     if (!W) return;
     const year = effectiveYear(data, state.year);
     const rows = rowsFor(state, year);
@@ -92,6 +92,6 @@ export function createDrivers(el, legendEl, tableEl, { data, store }) {
     render(store.get(), 0);
   });
   store.subscribe((s, changed) => {
-    if (changed.has('year') || changed.has('sel')) render(s);
+    if (changed.has('year') || changed.has('sel') || changed.has('focus')) render(s);
   });
 }

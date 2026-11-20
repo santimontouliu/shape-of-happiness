@@ -2,6 +2,7 @@
 import * as d3 from 'd3';
 import { FACTORS, REGIONS, fmt, prepare, regionActive } from './data.js';
 import { createStore } from './store.js';
+import { initNavigation } from './navigation.js';
 import { initControls } from './controls.js';
 import { renderTable } from './lib/dom.js';
 import { countryInsight, factorInsight, mapInsight } from './lib/insights.js';
@@ -32,7 +33,7 @@ async function main() {
   );
   const ctx = { data, store, featured: FEATURED };
 
-  initControls(ctx);
+  const controls = initControls(ctx);
   createHero($('#hero-chart'), $('#hero-stats'), ctx);
   createMap($('#map-chart'), ctx);
   drawLegend($('#map-legend'));
@@ -74,13 +75,16 @@ async function main() {
     ], rows);
   };
   store.subscribe((s, changed) => {
-    if (!(changed.size === 1 && changed.has('hover'))) renderText(s);
+    if ([...changed].some((key) => !['hover', 'chapter', 'focus'].includes(key))) renderText(s);
   });
   renderText(store.get());
+
+  const navigation = initNavigation(ctx, controls);
 
   $('#copy-link').addEventListener('click', async (e) => {
     const btn = e.currentTarget;
     try {
+      navigation.captureChapter();
       store.flushUrl();
       await navigator.clipboard.writeText(location.href);
       btn.dataset.state = 'copied';
@@ -89,18 +93,6 @@ async function main() {
     }
     setTimeout(() => delete btn.dataset.state, 1800);
   });
-  document.querySelectorAll('a[href^="#"]').forEach((link) => {
-    link.addEventListener('click', (e) => {
-      const targetId = link.getAttribute('href').slice(1);
-      const target = document.getElementById(targetId);
-      if (target) {
-        e.preventDefault();
-        target.scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth' });
-        if (link.classList.contains('skip-link')) target.focus({ preventScroll: true });
-      }
-    });
-  });
-
   document.documentElement.classList.add('is-ready');
 }
 
