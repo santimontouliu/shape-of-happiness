@@ -8,19 +8,22 @@ export function createHero(el, statsEl, { data, store, featured }) {
   const rows = data.rows(year);
   const svg = d3.select(el).append('svg').attr('role', 'img')
     .attr('aria-label', `Each of ${rows.length} countries plotted by its ${year} happiness score, from lowest on the left to highest on the right.`);
+  // Leaders sit behind the dots; annotations never intercept pointer input.
+  const leaders = svg.append('g').attr('aria-hidden', true).attr('pointer-events', 'none');
   let played = false;
 
   renderStats(statsEl, data, year, featured);
 
   function layout(W) {
-    const H = W < 640 ? 220 : 280;
+    const H = 280;
+    const swarmY = W < 640 ? 155 : H / 2 - 10;
     const R = W < 640 ? 4.2 : 6;
     svg.attr('viewBox', `0 0 ${W} ${H}`);
     const x = d3.scaleLinear().domain([1, 8]).range([16, W - 16]);
-    const nodes = rows.map((r) => ({ r, x: x(r.score), y: H / 2 }));
+    const nodes = rows.map((r) => ({ r, x: x(r.score), y: swarmY }));
     const sim = d3.forceSimulation(nodes)
       .force('x', d3.forceX((d) => x(d.r.score)).strength(1))
-      .force('y', d3.forceY(H / 2 - 10).strength(0.07))
+      .force('y', d3.forceY(swarmY).strength(0.07))
       .force('collide', d3.forceCollide(R + 1.2))
       .stop();
     for (let i = 0; i < 220; i++) sim.tick();
@@ -53,13 +56,17 @@ export function createHero(el, statsEl, { data, store, featured }) {
     }
 
     const notes = [d3.greatest(nodes, (d) => d.r.score), nodes.find((d) => d.r.c.id === featured), d3.least(nodes, (d) => d.r.score)]
-      .filter((d) => d && (W >= 640 || d.r.c.id !== featured));
-    svg.selectAll('line.hero-leader').data(W < 640 ? notes : [], (d) => d.r.c.id).join('line')
+      .filter(Boolean);
+    // Reserve a clear annotation lane above the swarm. On small screens,
+    // stagger the featured country so its name cannot collide with the leader.
+    const noteY = (d) => W < 640 && d.r.c.id === featured ? 44 : 24;
+    leaders.selectAll('line.hero-leader').data(notes, (d) => d.r.c.id).join('line')
       .attr('class', 'hero-leader').attr('x1', (d) => d.x).attr('x2', (d) => d.x)
-      .attr('y1', 30).attr('y2', (d) => d.y - R - 4).attr('stroke', 'var(--color-muted)').attr('stroke-opacity', 0.5);
+      .attr('y1', (d) => noteY(d) + 7).attr('y2', (d) => d.y - R - 4);
     svg.selectAll('text.hero-note').data(notes, (d) => d.r.c.id).join('text')
       .attr('class', (d) => `hero-note${d.r.c.id === featured ? ' is-featured' : ''}`)
-      .attr('x', (d) => d.x).attr('y', (d) => W < 640 ? 24 : d.y - R - 8)
+      .attr('x', (d) => d.x).attr('y', noteY)
+      .attr('pointer-events', 'none')
       .attr('text-anchor', (d) => (d.x > W - 80 ? 'end' : d.x < 80 ? 'start' : 'middle'))
       .text((d) => d.r.c.name);
   }

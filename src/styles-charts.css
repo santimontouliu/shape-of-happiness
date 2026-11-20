@@ -54,9 +54,18 @@
   stroke-width: 2px;
 }
 .hero-note {
-  font-size: 0.75rem;
+  paint-order: stroke fill;
+  stroke: var(--color-bg);
+  stroke-width: 4px;
+  stroke-linejoin: round;
+  font-size: 13px;
   font-weight: 600;
   fill: #fff;
+}
+.hero-leader {
+  stroke: var(--color-muted);
+  stroke-opacity: 0.65;
+  stroke-width: 1px;
 }
 .hero-note.is-featured {
   fill: var(--color-accent);
