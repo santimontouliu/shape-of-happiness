@@ -8,7 +8,7 @@ export function initNavigation({ store }, controls) {
   let navigationTimer;
 
   function captureChapter() {
-    if (navigating) return;
+    if (navigating || document.getElementById('filter-panel').classList.contains('is-open')) return;
     const edge = document.querySelector('.site-header').getBoundingClientRect().bottom + 80;
     const section = sections.findLast((el) => el.getBoundingClientRect().top <= edge) || sections[0];
     store.set({ chapter: section.id });

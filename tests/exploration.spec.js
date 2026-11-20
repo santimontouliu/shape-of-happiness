@@ -53,3 +53,18 @@ test('legacy chapter anchors still open their chapter', async ({ page }) => {
   await ready(page, '#compare');
   await belowHeader(page, 'compare');
 });
+
+test('opening mobile filters keeps the chapter being shared', async ({ page, isMobile }) => {
+  test.skip(!isMobile, 'Mobile filter panel');
+  await ready(page, '#chapter=compare');
+  await belowHeader(page, 'compare');
+  await page.waitForTimeout(200);
+  await page.locator('#filter-toggle').click();
+  await page.waitForTimeout(300);
+  await expect(page).toHaveURL(/chapter=compare/);
+  await page.evaluate(() => {
+    Object.defineProperty(navigator, 'clipboard', { value: { writeText: async (text) => { window.copiedLink = text; } }, configurable: true });
+  });
+  await page.locator('#copy-link').click();
+  expect(await page.evaluate(() => window.copiedLink)).toContain('chapter=compare');
+});
